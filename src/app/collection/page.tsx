@@ -283,11 +283,29 @@ export default function CollectionPage() {
       {loading ? (
         <p className="text-gray-400 text-center py-20">Chargement...</p>
       ) : filteredCoins.length === 0 ? (
-        <p className="text-gray-400 text-center py-20">
-          {hasActiveFilters
-            ? "Aucune piece ne correspond aux filtres."
-            : "Aucune piece dans la collection."}
-        </p>
+        <div className="text-center py-20">
+          <p className="text-gray-400">
+            {hasActiveFilters
+              ? "Aucune piece ne correspond aux filtres."
+              : "Aucune piece dans la collection."}
+          </p>
+          {!hasActiveFilters && !user && (
+            <a
+              href="/login"
+              className="inline-block mt-4 px-6 py-2 bg-amber-600 text-white rounded-lg text-sm font-medium hover:bg-amber-700 transition-colors"
+            >
+              Connectez-vous pour ajouter votre premiere piece
+            </a>
+          )}
+          {!hasActiveFilters && user && (
+            <button
+              onClick={() => setShowForm(true)}
+              className="mt-4 px-6 py-2 bg-amber-600 text-white rounded-lg text-sm font-medium hover:bg-amber-700 transition-colors"
+            >
+              + Ajouter votre premiere piece
+            </button>
+          )}
+        </div>
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {filteredCoins.map((coin) => (
