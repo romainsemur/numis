@@ -89,3 +89,25 @@ $$ language plpgsql security definer;
 create trigger on_auth_user_created
   after insert on auth.users
   for each row execute procedure public.handle_new_user();
+
+-- Storage bucket for coin images
+-- Run this in the Supabase dashboard SQL editor:
+insert into storage.buckets (id, name, public) values ('coin-images', 'coin-images', true);
+
+create policy "Anyone can view coin images"
+  on storage.objects for select using (bucket_id = 'coin-images');
+
+create policy "Authenticated users can upload coin images"
+  on storage.objects for insert with check (
+    bucket_id = 'coin-images' and auth.role() = 'authenticated'
+  );
+
+create policy "Users can update their own coin images"
+  on storage.objects for update using (
+    bucket_id = 'coin-images' and (storage.foldername(name))[1] = auth.uid()::text
+  );
+
+create policy "Users can delete their own coin images"
+  on storage.objects for delete using (
+    bucket_id = 'coin-images' and (storage.foldername(name))[1] = auth.uid()::text
+  );

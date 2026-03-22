@@ -1,10 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { createClient } from "@/lib/supabase/client";
 import CoinCard from "@/components/CoinCard";
+import ImageUpload from "@/components/ImageUpload";
 import type { Coin } from "@/lib/supabase/types";
 import type { User } from "@supabase/supabase-js";
+
+type SortOption = "recent" | "oldest" | "name" | "year";
 
 export default function CollectionPage() {
   const supabase = createClient();
@@ -12,6 +15,14 @@ export default function CollectionPage() {
   const [user, setUser] = useState<User | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [newImageUrl, setNewImageUrl] = useState<string | null>(null);
+
+  // Filters
+  const [search, setSearch] = useState("");
+  const [filterCountry, setFilterCountry] = useState("");
+  const [filterGrade, setFilterGrade] = useState("");
+  const [filterTrade, setFilterTrade] = useState(false);
+  const [sort, setSort] = useState<SortOption>("recent");
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setUser(data.user));
@@ -27,6 +38,62 @@ export default function CollectionPage() {
     setLoading(false);
   }
 
+  // Derived unique values for filter dropdowns
+  const countries = useMemo(
+    () =>
+      Array.from(new Set(coins.map((c) => c.country).filter(Boolean))).sort(),
+    [coins]
+  );
+  const grades = useMemo(
+    () => Array.from(new Set(coins.map((c) => c.grade).filter(Boolean))),
+    [coins]
+  );
+
+  // Filtered and sorted coins
+  const filteredCoins = useMemo(() => {
+    let result = coins;
+
+    if (search) {
+      const q = search.toLowerCase();
+      result = result.filter(
+        (c) =>
+          c.name.toLowerCase().includes(q) ||
+          c.country?.toLowerCase().includes(q) ||
+          c.description?.toLowerCase().includes(q)
+      );
+    }
+    if (filterCountry) {
+      result = result.filter((c) => c.country === filterCountry);
+    }
+    if (filterGrade) {
+      result = result.filter((c) => c.grade === filterGrade);
+    }
+    if (filterTrade) {
+      result = result.filter((c) => c.is_for_trade);
+    }
+
+    switch (sort) {
+      case "oldest":
+        result = [...result].sort(
+          (a, b) =>
+            new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+        );
+        break;
+      case "name":
+        result = [...result].sort((a, b) => a.name.localeCompare(b.name));
+        break;
+      case "year":
+        result = [...result].sort(
+          (a, b) => (a.year ?? 0) - (b.year ?? 0)
+        );
+        break;
+      default:
+        break;
+    }
+
+    return result;
+  }, [coins, search, filterCountry, filterGrade, filterTrade, sort]);
+
   async function handleAddCoin(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!user) return;
@@ -40,17 +107,21 @@ export default function CollectionPage() {
       grade: (form.get("grade") as string) || null,
       description: (form.get("description") as string) || null,
       is_for_trade: form.get("is_for_trade") === "on",
+      image_url: newImageUrl,
     });
 
     if (!error) {
       setShowForm(false);
+      setNewImageUrl(null);
       loadCoins();
     }
   }
 
+  const hasActiveFilters = search || filterCountry || filterGrade || filterTrade;
+
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold text-gray-900">Collection</h1>
         {user && (
           <button
@@ -103,6 +174,13 @@ export default function CollectionPage() {
             rows={2}
             className="px-3 py-2 border border-gray-300 rounded-lg text-sm md:col-span-2"
           />
+          <div className="md:col-span-2">
+            <ImageUpload
+              currentUrl={newImageUrl}
+              userId={user?.id ?? ""}
+              onUploaded={setNewImageUrl}
+            />
+          </div>
           <label className="flex items-center gap-2 text-sm text-gray-600">
             <input name="is_for_trade" type="checkbox" />
             Disponible pour echange
@@ -118,15 +196,91 @@ export default function CollectionPage() {
         </form>
       )}
 
+      {/* Search & Filters */}
+      {!loading && coins.length > 0 && (
+        <div className="mb-6 space-y-3">
+          <input
+            type="text"
+            placeholder="Rechercher par nom, pays, description..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm"
+          />
+          <div className="flex flex-wrap gap-3 items-center">
+            <select
+              value={filterCountry}
+              onChange={(e) => setFilterCountry(e.target.value)}
+              className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm text-gray-700"
+            >
+              <option value="">Tous les pays</option>
+              {countries.map((c) => (
+                <option key={c} value={c!}>
+                  {c}
+                </option>
+              ))}
+            </select>
+            <select
+              value={filterGrade}
+              onChange={(e) => setFilterGrade(e.target.value)}
+              className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm text-gray-700"
+            >
+              <option value="">Tous les etats</option>
+              {grades.map((g) => (
+                <option key={g} value={g!}>
+                  {g}
+                </option>
+              ))}
+            </select>
+            <label className="flex items-center gap-1.5 text-sm text-gray-600">
+              <input
+                type="checkbox"
+                checked={filterTrade}
+                onChange={(e) => setFilterTrade(e.target.checked)}
+              />
+              A echanger
+            </label>
+            <select
+              value={sort}
+              onChange={(e) => setSort(e.target.value as SortOption)}
+              className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm text-gray-700 ml-auto"
+            >
+              <option value="recent">Plus recentes</option>
+              <option value="oldest">Plus anciennes</option>
+              <option value="name">Nom A-Z</option>
+              <option value="year">Annee</option>
+            </select>
+            {hasActiveFilters && (
+              <button
+                onClick={() => {
+                  setSearch("");
+                  setFilterCountry("");
+                  setFilterGrade("");
+                  setFilterTrade(false);
+                }}
+                className="text-xs text-amber-600 hover:underline"
+              >
+                Reinitialiser
+              </button>
+            )}
+          </div>
+          <p className="text-xs text-gray-400">
+            {filteredCoins.length} piece{filteredCoins.length !== 1 ? "s" : ""}
+            {hasActiveFilters ? " (filtrees)" : ""}
+          </p>
+        </div>
+      )}
+
       {loading ? (
         <p className="text-gray-400 text-center py-20">Chargement...</p>
-      ) : coins.length === 0 ? (
+      ) : filteredCoins.length === 0 ? (
         <p className="text-gray-400 text-center py-20">
-          Aucune piece dans la collection.
+          {hasActiveFilters
+            ? "Aucune piece ne correspond aux filtres."
+            : "Aucune piece dans la collection."}
         </p>
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {coins.map((coin) => (
+          {filteredCoins.map((coin) => (
             <CoinCard
               key={coin.id}
               coin={coin}

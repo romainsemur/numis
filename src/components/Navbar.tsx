@@ -51,7 +51,13 @@ export default function Navbar() {
                 href={`/profile/${user.user_metadata?.username || user.id}`}
                 className={linkClass("/profile")}
               >
-                Mon profil
+                Profil
+              </Link>
+              <Link
+                href="/profile/edit"
+                className={linkClass("/profile/edit")}
+              >
+                Parametres
               </Link>
               <button
                 onClick={async () => {

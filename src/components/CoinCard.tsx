@@ -8,7 +8,10 @@ interface CoinCardProps {
 
 export default function CoinCard({ coin, showTradeButton }: CoinCardProps) {
   return (
-    <div className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
+    <Link
+      href={`/collection/${coin.id}`}
+      className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow block"
+    >
       <div className="aspect-square bg-gray-100 flex items-center justify-center">
         {coin.image_url ? (
           <img
@@ -41,15 +44,12 @@ export default function CoinCard({ coin, showTradeButton }: CoinCardProps) {
             </span>
           )}
           {showTradeButton && coin.is_for_trade && (
-            <Link
-              href={`/offers?coin=${coin.id}`}
-              className="text-xs text-amber-600 hover:text-amber-700 font-medium"
-            >
+            <span className="text-xs text-amber-600 font-medium">
               Proposer un echange
-            </Link>
+            </span>
           )}
         </div>
       </div>
-    </div>
+    </Link>
   );
 }
