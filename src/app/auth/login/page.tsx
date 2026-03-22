@@ -4,6 +4,7 @@ import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import Logo from "@/components/Logo";
 
 export default function LoginPage() {
   const supabase = createClient();
@@ -33,7 +34,10 @@ export default function LoginPage() {
 
   return (
     <div className="max-w-sm mx-auto px-4 py-20">
-      <h1 className="text-2xl font-bold text-gray-900 mb-6 text-center">
+      <div className="flex justify-center mb-6">
+        <Logo size={56} />
+      </div>
+      <h1 className="text-2xl font-bold text-brown-800 mb-6 text-center">
         Connexion
       </h1>
 
@@ -43,28 +47,28 @@ export default function LoginPage() {
           type="email"
           required
           placeholder="Email"
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+          className="w-full px-4 py-2.5 border border-brown-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-gold-400/50 focus:border-gold-400"
         />
         <input
           name="password"
           type="password"
           required
           placeholder="Mot de passe"
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+          className="w-full px-4 py-2.5 border border-brown-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-gold-400/50 focus:border-gold-400"
         />
         {error && <p className="text-sm text-red-600">{error}</p>}
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-2 bg-amber-600 text-white rounded-lg font-medium hover:bg-amber-700 transition-colors disabled:opacity-50"
+          className="w-full py-2.5 btn-gold rounded-lg font-semibold disabled:opacity-50"
         >
           {loading ? "Connexion..." : "Se connecter"}
         </button>
       </form>
 
-      <p className="mt-4 text-center text-sm text-gray-500">
+      <p className="mt-6 text-center text-sm text-brown-400">
         Pas encore de compte ?{" "}
-        <Link href="/auth/register" className="text-amber-600 hover:underline">
+        <Link href="/auth/register" className="text-gold-600 hover:underline font-medium">
           S&apos;inscrire
         </Link>
       </p>

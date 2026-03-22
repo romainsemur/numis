@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Navbar from "@/components/Navbar";
+import Logo from "@/components/Logo";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -18,8 +19,16 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         <Navbar />
         <main className="flex-1">{children}</main>
-        <footer className="border-t border-gray-200 py-6 text-center text-sm text-gray-400">
-          Numis &mdash; Collection de pieces de monnaie
+        <footer className="border-t border-brown-200/50 bg-brown-800 py-10">
+          <div className="max-w-6xl mx-auto px-4 flex flex-col items-center gap-3">
+            <Logo size={28} />
+            <p className="text-brown-300 text-sm">
+              Numis &mdash; La plateforme des collectionneurs de monnaie
+            </p>
+            <p className="text-brown-500 text-xs">
+              &copy; {new Date().getFullYear()} Numis. Tous droits reserves.
+            </p>
+          </div>
         </footer>
       </body>
     </html>

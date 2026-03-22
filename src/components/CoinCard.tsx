@@ -20,9 +20,9 @@ export default function CoinCard({ coin, showTradeButton }: CoinCardProps) {
   return (
     <Link
       href={`/collection/${coin.id}`}
-      className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow block"
+      className="card-numis overflow-hidden block"
     >
-      <div className="relative aspect-square bg-gray-100 flex items-center justify-center">
+      <div className="relative aspect-square bg-gold-50 flex items-center justify-center">
         {imageUrl ? (
           <img
             src={imageUrl}
@@ -36,7 +36,7 @@ export default function CoinCard({ coin, showTradeButton }: CoinCardProps) {
             className="w-full h-full object-cover"
           />
         ) : (
-          <span className="text-4xl text-gray-300">&#x1FA99;</span>
+          <span className="text-4xl text-brown-200">&#x1FA99;</span>
         )}
         {hasBothSides && (
           <div className="absolute bottom-1.5 right-1.5 flex gap-1">
@@ -47,8 +47,8 @@ export default function CoinCard({ coin, showTradeButton }: CoinCardProps) {
               }}
               className={`w-6 h-6 rounded-full text-[10px] font-bold transition-colors ${
                 side === "obverse"
-                  ? "bg-amber-600 text-white"
-                  : "bg-white/80 text-gray-500 hover:bg-white"
+                  ? "bg-gold-500 text-white"
+                  : "bg-white/80 text-brown-400 hover:bg-white"
               }`}
             >
               A
@@ -60,8 +60,8 @@ export default function CoinCard({ coin, showTradeButton }: CoinCardProps) {
               }}
               className={`w-6 h-6 rounded-full text-[10px] font-bold transition-colors ${
                 side === "reverse"
-                  ? "bg-amber-600 text-white"
-                  : "bg-white/80 text-gray-500 hover:bg-white"
+                  ? "bg-gold-500 text-white"
+                  : "bg-white/80 text-brown-400 hover:bg-white"
               }`}
             >
               R
@@ -70,16 +70,16 @@ export default function CoinCard({ coin, showTradeButton }: CoinCardProps) {
         )}
       </div>
       <div className="p-4">
-        <h3 className="font-semibold text-gray-900 truncate">{coin.name}</h3>
-        <div className="flex gap-2 mt-1 text-sm text-gray-500">
+        <h3 className="font-semibold text-brown-800 truncate">{coin.name}</h3>
+        <div className="flex gap-2 mt-1 text-sm text-brown-400">
           {coin.year && <span>{coin.year}</span>}
           {coin.country && <span>{coin.country}</span>}
           {coin.grade && (
-            <span className="bg-gray-100 px-1.5 rounded">{coin.grade}</span>
+            <span className="bg-gold-50 text-gold-700 px-1.5 rounded">{coin.grade}</span>
           )}
         </div>
         {coin.description && (
-          <p className="mt-2 text-sm text-gray-600 line-clamp-2">
+          <p className="mt-2 text-sm text-brown-300 line-clamp-2">
             {coin.description}
           </p>
         )}
@@ -90,7 +90,7 @@ export default function CoinCard({ coin, showTradeButton }: CoinCardProps) {
             </span>
           )}
           {showTradeButton && coin.is_for_trade && (
-            <span className="text-xs text-amber-600 font-medium">
+            <span className="text-xs text-gold-600 font-medium">
               Proposer un echange
             </span>
           )}
