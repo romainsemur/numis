@@ -15,7 +15,8 @@ export default function CollectionPage() {
   const [user, setUser] = useState<User | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [newImageUrl, setNewImageUrl] = useState<string | null>(null);
+  const [newObverseUrl, setNewObverseUrl] = useState<string | null>(null);
+  const [newReverseUrl, setNewReverseUrl] = useState<string | null>(null);
 
   // Filters
   const [search, setSearch] = useState("");
@@ -107,12 +108,14 @@ export default function CollectionPage() {
       grade: (form.get("grade") as string) || null,
       description: (form.get("description") as string) || null,
       is_for_trade: form.get("is_for_trade") === "on",
-      image_url: newImageUrl,
+      image_obverse_url: newObverseUrl,
+      image_reverse_url: newReverseUrl,
     });
 
     if (!error) {
       setShowForm(false);
-      setNewImageUrl(null);
+      setNewObverseUrl(null);
+      setNewReverseUrl(null);
       loadCoins();
     }
   }
@@ -174,11 +177,18 @@ export default function CollectionPage() {
             rows={2}
             className="px-3 py-2 border border-gray-300 rounded-lg text-sm md:col-span-2"
           />
-          <div className="md:col-span-2">
+          <div className="md:col-span-2 flex gap-4">
             <ImageUpload
-              currentUrl={newImageUrl}
+              currentUrl={newObverseUrl}
               userId={user?.id ?? ""}
-              onUploaded={setNewImageUrl}
+              label="Avers"
+              onUploaded={setNewObverseUrl}
+            />
+            <ImageUpload
+              currentUrl={newReverseUrl}
+              userId={user?.id ?? ""}
+              label="Revers"
+              onUploaded={setNewReverseUrl}
             />
           </div>
           <label className="flex items-center gap-2 text-sm text-gray-600">

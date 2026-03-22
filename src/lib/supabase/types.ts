@@ -30,7 +30,8 @@ export interface Database {
           year: number | null;
           country: string | null;
           grade: string | null;
-          image_url: string | null;
+          image_obverse_url: string | null;
+          image_reverse_url: string | null;
           is_for_trade: boolean;
           description: string | null;
           created_at: string;
@@ -42,7 +43,8 @@ export interface Database {
           year?: number | null;
           country?: string | null;
           grade?: string | null;
-          image_url?: string | null;
+          image_obverse_url?: string | null;
+          image_reverse_url?: string | null;
           is_for_trade?: boolean;
           description?: string | null;
         };
@@ -51,7 +53,8 @@ export interface Database {
           year?: number | null;
           country?: string | null;
           grade?: string | null;
-          image_url?: string | null;
+          image_obverse_url?: string | null;
+          image_reverse_url?: string | null;
           is_for_trade?: boolean;
           description?: string | null;
         };

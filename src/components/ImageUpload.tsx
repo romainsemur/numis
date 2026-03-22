@@ -6,12 +6,14 @@ import { createClient } from "@/lib/supabase/client";
 interface ImageUploadProps {
   currentUrl: string | null;
   userId: string;
+  label?: string;
   onUploaded: (url: string | null) => void;
 }
 
 export default function ImageUpload({
   currentUrl,
   userId,
+  label = "Photo",
   onUploaded,
 }: ImageUploadProps) {
   const supabase = createClient();
@@ -50,13 +52,13 @@ export default function ImageUpload({
   return (
     <div>
       <label className="block text-sm font-medium text-gray-700 mb-1">
-        Photo
+        {label}
       </label>
       {preview ? (
         <div className="relative w-40 h-40 rounded-lg overflow-hidden border border-gray-200">
           <img
             src={preview}
-            alt="Apercu"
+            alt={label}
             className="w-full h-full object-cover"
           />
           <button
@@ -75,7 +77,7 @@ export default function ImageUpload({
             ) : (
               <>
                 <span className="text-2xl text-gray-300 block">+</span>
-                <span className="text-xs text-gray-400">Ajouter une photo</span>
+                <span className="text-xs text-gray-400">{label}</span>
               </>
             )}
           </div>

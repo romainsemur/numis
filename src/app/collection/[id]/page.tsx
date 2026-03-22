@@ -19,6 +19,9 @@ export default function CoinDetailPage() {
   const [offerMessage, setOfferMessage] = useState("");
   const [offerSent, setOfferSent] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [activeSide, setActiveSide] = useState<"obverse" | "reverse">(
+    "obverse"
+  );
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setUser(data.user));
@@ -52,11 +55,15 @@ export default function CoinDetailPage() {
   async function handleDelete() {
     if (!coin) return;
 
-    if (coin.image_url) {
-      const path = coin.image_url.split("/coin-images/")[1];
-      if (path) {
-        await supabase.storage.from("coin-images").remove([path]);
+    const paths: string[] = [];
+    for (const url of [coin.image_obverse_url, coin.image_reverse_url]) {
+      if (url) {
+        const path = url.split("/coin-images/")[1];
+        if (path) paths.push(path);
       }
+    }
+    if (paths.length > 0) {
+      await supabase.storage.from("coin-images").remove(paths);
     }
 
     const { error } = await supabase.from("coins").delete().eq("id", coin.id);
@@ -100,6 +107,12 @@ export default function CoinDetailPage() {
   }
 
   const isOwner = user?.id === coin.user_id;
+  const hasObverse = !!coin.image_obverse_url;
+  const hasReverse = !!coin.image_reverse_url;
+  const activeImage =
+    activeSide === "obverse"
+      ? coin.image_obverse_url
+      : coin.image_reverse_url;
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
@@ -111,16 +124,64 @@ export default function CoinDetailPage() {
       </Link>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* Image */}
-        <div className="aspect-square bg-gray-100 rounded-xl flex items-center justify-center overflow-hidden">
-          {coin.image_url ? (
-            <img
-              src={coin.image_url}
-              alt={coin.name}
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <span className="text-8xl text-gray-300">&#x1FA99;</span>
+        {/* Images */}
+        <div>
+          <div className="aspect-square bg-gray-100 rounded-xl flex items-center justify-center overflow-hidden">
+            {activeImage ? (
+              <img
+                src={activeImage}
+                alt={`${coin.name} - ${activeSide === "obverse" ? "Avers" : "Revers"}`}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <span className="text-8xl text-gray-300">&#x1FA99;</span>
+            )}
+          </div>
+          {(hasObverse || hasReverse) && (
+            <div className="flex gap-2 mt-3">
+              {hasObverse && (
+                <button
+                  onClick={() => setActiveSide("obverse")}
+                  className={`flex-1 rounded-lg overflow-hidden border-2 transition-colors ${
+                    activeSide === "obverse"
+                      ? "border-amber-500"
+                      : "border-gray-200 hover:border-gray-300"
+                  }`}
+                >
+                  <div className="aspect-square bg-gray-100 relative">
+                    <img
+                      src={coin.image_obverse_url!}
+                      alt="Avers"
+                      className="w-full h-full object-cover"
+                    />
+                    <span className="absolute bottom-1 left-1 text-[10px] bg-black/50 text-white px-1.5 py-0.5 rounded">
+                      Avers
+                    </span>
+                  </div>
+                </button>
+              )}
+              {hasReverse && (
+                <button
+                  onClick={() => setActiveSide("reverse")}
+                  className={`flex-1 rounded-lg overflow-hidden border-2 transition-colors ${
+                    activeSide === "reverse"
+                      ? "border-amber-500"
+                      : "border-gray-200 hover:border-gray-300"
+                  }`}
+                >
+                  <div className="aspect-square bg-gray-100 relative">
+                    <img
+                      src={coin.image_reverse_url!}
+                      alt="Revers"
+                      className="w-full h-full object-cover"
+                    />
+                    <span className="absolute bottom-1 left-1 text-[10px] bg-black/50 text-white px-1.5 py-0.5 rounded">
+                      Revers
+                    </span>
+                  </div>
+                </button>
+              )}
+            </div>
           )}
         </div>
 

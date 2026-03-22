@@ -16,7 +16,8 @@ export default function EditCoinPage() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [obverseUrl, setObverseUrl] = useState<string | null>(null);
+  const [reverseUrl, setReverseUrl] = useState<string | null>(null);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setUser(data.user));
@@ -32,7 +33,8 @@ export default function EditCoinPage() {
 
     const coinData = data as Coin | null;
     setCoin(coinData);
-    setImageUrl(coinData?.image_url ?? null);
+    setObverseUrl(coinData?.image_obverse_url ?? null);
+    setReverseUrl(coinData?.image_reverse_url ?? null);
     setLoading(false);
   }
 
@@ -51,7 +53,8 @@ export default function EditCoinPage() {
         grade: (form.get("grade") as string) || null,
         description: (form.get("description") as string) || null,
         is_for_trade: form.get("is_for_trade") === "on",
-        image_url: imageUrl,
+        image_obverse_url: obverseUrl,
+        image_reverse_url: reverseUrl,
       })
       .eq("id", coin.id);
 
@@ -167,11 +170,20 @@ export default function EditCoinPage() {
           />
         </div>
 
-        <ImageUpload
-          currentUrl={imageUrl}
-          userId={user?.id ?? ""}
-          onUploaded={setImageUrl}
-        />
+        <div className="flex gap-4">
+          <ImageUpload
+            currentUrl={obverseUrl}
+            userId={user?.id ?? ""}
+            label="Avers"
+            onUploaded={setObverseUrl}
+          />
+          <ImageUpload
+            currentUrl={reverseUrl}
+            userId={user?.id ?? ""}
+            label="Revers"
+            onUploaded={setReverseUrl}
+          />
+        </div>
 
         <label className="flex items-center gap-2 text-sm text-gray-600">
           <input

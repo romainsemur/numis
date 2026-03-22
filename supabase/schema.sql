@@ -26,7 +26,8 @@ create table public.coins (
   year int,
   country text,
   grade text,
-  image_url text,
+  image_obverse_url text,
+  image_reverse_url text,
   is_for_trade boolean default false not null,
   description text,
   created_at timestamptz default now() not null

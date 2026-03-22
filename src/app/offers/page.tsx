@@ -7,7 +7,7 @@ import type { Offer } from "@/lib/supabase/types";
 import type { User } from "@supabase/supabase-js";
 
 interface OfferWithDetails extends Offer {
-  coin: { id: string; name: string; image_url: string | null; is_for_trade: boolean } | null;
+  coin: { id: string; name: string; image_obverse_url: string | null; is_for_trade: boolean } | null;
   from_user: { username: string } | null;
   to_user: { username: string } | null;
 }
@@ -36,14 +36,14 @@ export default function OffersPage() {
       supabase
         .from("offers")
         .select(
-          "*, coin:coins(id, name, image_url, is_for_trade), from_user:profiles!offers_from_user_id_fkey(username)"
+          "*, coin:coins(id, name, image_obverse_url, is_for_trade), from_user:profiles!offers_from_user_id_fkey(username)"
         )
         .eq("to_user_id", userId)
         .order("created_at", { ascending: false }),
       supabase
         .from("offers")
         .select(
-          "*, coin:coins(id, name, image_url, is_for_trade), to_user:profiles!offers_to_user_id_fkey(username)"
+          "*, coin:coins(id, name, image_obverse_url, is_for_trade), to_user:profiles!offers_to_user_id_fkey(username)"
         )
         .eq("from_user_id", userId)
         .order("created_at", { ascending: false }),
@@ -202,9 +202,9 @@ export default function OffersPage() {
                     href={offer.coin ? `/collection/${offer.coin.id}` : "#"}
                     className="w-24 h-24 flex-shrink-0 bg-gray-100 flex items-center justify-center"
                   >
-                    {offer.coin?.image_url ? (
+                    {offer.coin?.image_obverse_url ? (
                       <img
-                        src={offer.coin.image_url}
+                        src={offer.coin.image_obverse_url}
                         alt={offer.coin.name}
                         className="w-full h-full object-cover"
                       />
