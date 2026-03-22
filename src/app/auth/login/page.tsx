@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Logo from "@/components/Logo";
+import GoogleButton from "@/components/GoogleButton";
 
 export default function LoginPage() {
   const supabase = createClient();
@@ -40,6 +41,17 @@ export default function LoginPage() {
       <h1 className="text-2xl font-bold text-brown-800 mb-6 text-center">
         Connexion
       </h1>
+
+      <GoogleButton />
+
+      <div className="relative my-6">
+        <div className="absolute inset-0 flex items-center">
+          <div className="w-full border-t border-brown-200" />
+        </div>
+        <div className="relative flex justify-center text-xs">
+          <span className="bg-background px-3 text-brown-400">ou par email</span>
+        </div>
+      </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <input

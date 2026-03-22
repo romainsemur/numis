@@ -77,12 +77,30 @@ create index coins_is_for_trade_idx on public.coins(is_for_trade) where is_for_t
 create index offers_from_user_idx on public.offers(from_user_id);
 create index offers_to_user_idx on public.offers(to_user_id);
 
--- Auto-create profile on signup
+-- Auto-create profile on signup (supports email/password and OAuth)
 create or replace function public.handle_new_user()
 returns trigger as $$
+declare
+  _username text;
 begin
-  insert into public.profiles (id, username)
-  values (new.id, new.raw_user_meta_data->>'username');
+  -- Try username from metadata (email signup), then full_name (Google OAuth), then email prefix
+  _username := coalesce(
+    nullif(new.raw_user_meta_data->>'username', ''),
+    nullif(new.raw_user_meta_data->>'full_name', ''),
+    split_part(new.email, '@', 1)
+  );
+
+  -- Ensure uniqueness by appending random suffix if needed
+  if exists (select 1 from public.profiles where username = _username) then
+    _username := _username || '_' || substr(gen_random_uuid()::text, 1, 6);
+  end if;
+
+  insert into public.profiles (id, username, avatar_url)
+  values (
+    new.id,
+    _username,
+    nullif(new.raw_user_meta_data->>'avatar_url', '')
+  );
   return new;
 end;
 $$ language plpgsql security definer;
